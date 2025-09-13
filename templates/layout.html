@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Quiz App{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Header -->
+<header>
+    <div class="header-container">
+        <h1>M K Chetan Quiz App</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/quiz">Quizzes</a>
+            <a href="/about">About</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="content">
+    {% block content %}{% endblock %}
+</main>
+
+<!-- Footer -->
+<footer>
+    &copy; 2025 M K Chetan | Built with ❤️ for Quiz Lovers
+</footer>
+
+<!-- Optional JS -->
+<script src="/static/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+{% extends "layout.html" %}
+{% block title %}Quiz Result{% endblock %}
+
+{% block content %}
+<div class="result-container animate-card" id="result-card">
+    <h2 class="result-title">🎯 Quiz Completed!</h2>
+
+    <!-- Score -->
+    <div class="score-box">
+        <p class="score-text">Your Score</p>
+        <h1 class="score-highlight">{{ final_score }} / {{ total_questions }}</h1>
+    </div>
+
+    <!-- Performance Badge -->
+    <div class="badge">
+        {% if final_score == total_questions %}
+            <p class="badge perfect">🏆 Perfect! Quiz Master! 🏆</p>
+        {% elif final_score >= total_questions/2 %}
+            <p class="badge good">⭐ Great Effort! Keep Going ⭐</p>
+        {% else %}
+            <p class="badge poor">💡 Don’t Worry, Try Again 💡</p>
+        {% endif %}
+    </div>
+
+    <!-- Progress Circle -->
+    <div class="progress-ring">
+        <svg class="circle" width="180" height="180">
+            <circle class="bg" cx="90" cy="90" r="80"></circle>
+            <circle class="progress" cx="90" cy="90" r="80"
+                stroke-dasharray="502"
+                stroke-dashoffset="{{ 502 - (final_score / total_questions) * 502 }}"></circle>
+        </svg>
+        <div class="progress-label" id="progress-label">
+            {{ ((final_score / total_questions) * 100) | round(0) }}%
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-buttons">
+        <a class="btn primary nav-btn" href="/quiz">🔄 Play Again</a>
+        <a class="btn secondary nav-btn" href="/">🏠 Home</a>
+    </div>
+</div>
+{% endblock %}
+
+<style>
+/* ... keep your CSS as is ... */
+
+/* Add smooth hover effect hooks */
+.nav-btn {
+    display: inline-block;
+    cursor: pointer;
+}
+</style>
+
+<!-- Gradient for Circle -->
+<svg width="0" height="0">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6366f1; stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4; stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>
+
+<script type="module">
+import { animateCard, optionHoverEffect, optionClickEffect } from "/static/js/animations.js";
+
+/* Animate card on load */
+document.addEventListener("DOMContentLoaded", () => {
+    const card = document.getElementById("result-card");
+    animateCard(card);
+
+    // Enhance navigation buttons with hover & click animations
+    const navBtns = document.querySelectorAll(".nav-btn");
+    optionHoverEffect(navBtns);
+    optionClickEffect(navBtns);
+
+    // Animate % counter
+    const label = document.getElementById("progress-label");
+    if (label) {
+        const target = parseInt(label.innerText, 10);
+        let count = 0;
+        const step = Math.max(1, Math.floor(target / 40));
+        const interval = setInterval(() => {
+            count += step;
+            if (count >= target) {
+                label.innerText = target + "%";
+                clearInterval(interval);
+            } else {
+                label.innerText = count + "%";
+            }
+        }, 25);
+    }
+});
+</script>

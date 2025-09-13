@@ -1,0 +1,236 @@
+{% extends "layout.html" %}
+
+{% block title %}Quiz - {{ category if category else "Category" }}{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <div class="quiz-card animate-card shadow-hover">
+        <h2 class="quiz-title">{{ category if category else "Quiz" }}</h2>
+
+        <!-- Progress Bar -->
+        {% set q_num = question_number if question_number else 1 %}
+        {% set total_questions = 10 %}
+        {% set progress_width = (q_num * 100) // total_questions %}
+        <div class="progress-wrapper">
+            <div class="progress-bar" style="width:0;" data-width="{{ progress_width }}"></div>
+            <span class="progress-text">{{ progress_width }}%</span>
+        </div>
+
+        <!-- Question Info -->
+        <p class="quiz-info">
+            Question <span class="question-number">{{ q_num }}</span> of {{ total_questions }} 
+            | Score: <span class="score">{{ score if score is not none else 0 }}</span>
+        </p>
+
+        <!-- Result Feedback -->
+        {% if result %}
+            <div class="result-wrapper">
+                {% if 'Correct' in result %}
+                    <p class="result correct">{{ result }} 🎉</p>
+                {% else %}
+                    <p class="result wrong">{{ result }} 😢</p>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <!-- Question -->
+        {% if question %}
+        <form method="post" action="/check_answer" id="quizForm">
+            <p class="question-text"><strong>Q:</strong> {{ question['question'] }}</p>
+
+            {% for option in question.get('options', []) %}
+            <label class="option-label">
+                <input type="radio" name="user_answer" value="{{ option }}" required>
+                {{ option }}
+                <span class="emoji-feedback"></span>
+            </label>
+            {% endfor %}
+
+            <input type="hidden" name="correct_answer" value="{{ question.get('answer', '') }}">
+            <input type="hidden" name="category" value="{{ category }}">
+            <input type="hidden" name="question_number" value="{{ q_num }}">
+            <button class="btn submit-btn" type="submit">✅ Submit Answer</button>
+        </form>
+        {% else %}
+            <p class="no-question">⚠ No question available. Please select another category.</p>
+        {% endif %}
+
+        <!-- Navigation -->
+        <div class="quiz-nav">
+            <a class="btn secondary" href="/quiz">🔄 Choose Another Category</a>
+            <a class="btn secondary" href="/">🏠 Home</a>
+        </div>
+    </div>
+</div>
+
+<!-- Confetti Library -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("quizForm");
+    if (!form) return;
+
+    const correctAnswer = form.querySelector("input[name='correct_answer']").value;
+    const optionLabels = form.querySelectorAll(".option-label");
+
+    // Animate progress bar
+    const progressBar = document.querySelector(".progress-bar");
+    const progressWidth = progressBar.getAttribute("data-width");
+    setTimeout(() => { progressBar.style.width = progressWidth + "%"; }, 200);
+
+    // Smooth option selection highlight
+    optionLabels.forEach(label => {
+        label.addEventListener("click", () => {
+            optionLabels.forEach(l => {
+                l.classList.remove("selected");
+                l.querySelector(".emoji-feedback").textContent = "";
+            });
+            label.classList.add("selected");
+        });
+    });
+
+    // Handle submit
+    form.addEventListener("submit", function(e) {
+        e.preventDefault();
+        let isCorrect = false;
+
+        optionLabels.forEach(label => {
+            const input = label.querySelector("input[type='radio']");
+            const emojiSpan = label.querySelector(".emoji-feedback");
+            label.style.pointerEvents = "none";
+
+            if (input.value === correctAnswer) {
+                label.classList.add("correct-option");
+                emojiSpan.textContent = " 🎉";
+                if (input.checked) isCorrect = true;
+            } else if (input.checked) {
+                label.classList.add("wrong-option");
+                emojiSpan.textContent = " 😢";
+            }
+        });
+
+        if (isCorrect) {
+            confetti({
+                particleCount: 180,
+                spread: 160,
+                origin: { y: 0.6 },
+                colors: ['#00c6ff','#0072ff','#ff6a00','#ee0979','#f7971e']
+            });
+        }
+
+        // Submit with slight delay for UX
+        setTimeout(() => form.submit(), 900);
+    });
+});
+</script>
+
+<style>
+/* ================= UI IMPROVEMENTS v2 ================= */
+
+/* Card Animation */
+.animate-card { animation: fadeInUp 0.7s ease forwards; }
+@keyframes fadeInUp { 
+    0% { opacity: 0; transform: translateY(40px); } 
+    100% { opacity: 1; transform: translateY(0); } 
+}
+
+/* Quiz Card */
+.quiz-card {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 35px;
+    border-radius: 25px;
+    background: #f9fafc;
+    box-shadow: 10px 10px 25px #ccd6e6, -10px -10px 25px #ffffff;
+    transition: all 0.35s ease;
+}
+.quiz-card:hover { transform: translateY(-5px) scale(1.02); }
+
+/* Title */
+.quiz-title { text-align: center; margin-bottom: 20px; color: #4e54c8; }
+
+/* Question */
+.question-text { font-size: 1.25em; margin-bottom: 20px; color: #333; }
+
+/* Option Styles */
+.option-label {
+    display: block;
+    padding: 15px 18px;
+    border-radius: 15px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    background: #f1f3f6;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+.option-label:hover { transform: scale(1.04); background: #e8f0fe; }
+.option-label.selected { background: #d0ebff; border-color: #3399ff; }
+.option-label.correct-option { background: #d4edda; color: #155724; border-color: #28a745; }
+.option-label.wrong-option { background: #f8d7da; color: #721c24; border-color: #dc3545; }
+.emoji-feedback { margin-left: 10px; font-size: 1.2em; }
+
+/* Buttons */
+.submit-btn {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    font-weight: bold;
+    border-radius: 50px;
+    background: linear-gradient(90deg, #6a11cb, #2575fc);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: all 0.35s ease;
+}
+.submit-btn:hover { transform: scale(1.06); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+
+/* Navigation */
+.quiz-nav { margin-top: 25px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+.btn.secondary { background: linear-gradient(90deg, #11998e, #38ef7d); }
+.btn.secondary:hover { transform: scale(1.08); }
+
+/* Progress Bar */
+.progress-wrapper { width: 100%; height: 15px; background: #e6e9f0; border-radius: 12px; margin-bottom: 15px; overflow: hidden; }
+.progress-bar { height: 100%; background: linear-gradient(90deg,#6a11cb,#2575fc); transition: width 0.8s ease-in-out; }
+.progress-text { float: right; font-weight: bold; color: #6a11cb; margin-top: 5px; }
+
+/* Info + Result */
+.quiz-info { font-weight: bold; margin-bottom: 15px; color: #6a11cb; text-align: center; }
+.result-wrapper { text-align: center; margin: 15px 0; }
+.result.correct { color: #28a745; font-size: 1.2em; }
+.result.wrong { color: #dc3545; font-size: 1.2em; }
+.no-question { color: #ff5733; font-weight: bold; text-align: center; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .quiz-card { padding: 25px; }
+    .question-text { font-size: 1.1em; }
+}
+@media (max-width: 480px) {
+    .quiz-card { padding: 20px; }
+    .option-label { font-size: 0.95em; padding: 12px; }
+}
+</style>
+{% endblock %}
+
+<!-- External Modules -->
+<script type="module">
+    import { animateCard, optionHoverEffect } from "/static/frontend/animations.js";
+    import { launchConfetti } from "/static/frontend/confetti.js";
+    import { updateProgress } from "/static/frontend/progress.js";
+
+    const card = document.querySelector(".quiz-card");
+    animateCard(card);
+
+    const optionLabels = document.querySelectorAll(".option-label");
+    optionHoverEffect(optionLabels);
+
+    const progressBar = document.querySelector(".progress-bar");
+    const progressText = document.querySelector(".progress-text");
+    updateProgress(progressBar, progressText, progressBar.dataset.width);
+
+    // const wasAnswerCorrect = {{ 'true' if result and 'Correct' in result else 'false' | lower }};
+    if (typeof wasAnswerCorrect !== "undefined" && wasAnswerCorrect) launchConfetti();
+</script>

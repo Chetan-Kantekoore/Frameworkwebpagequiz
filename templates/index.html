@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <div class="hero">
+        <h1>Welcome to <span class="highlight">M K Chetan's Website!</span></h1>
+        <p>Challenge yourself with fun quizzes, explore categories, and track your score!</p>
+        <a class="btn" href="/quiz">Take a Quiz</a>
+    </div>
+
+    <div class="features">
+        <div class="feature-card">
+            <h3>🎯 Multiple Categories</h3>
+            <p>Choose from Science, Math, General Knowledge and more!</p>
+        </div>
+        <div class="feature-card">
+            <h3>🏆 Score & Rewards</h3>
+            <p>Earn points and see how well you perform.</p>
+        </div>
+        <div class="feature-card">
+            <h3>🎉 Fun for Everyone</h3>
+            <p>Easy to use, colorful design, and interactive for all ages.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Confetti JS -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script>
+  const quizBtn = document.querySelector('.hero .btn');
+
+  quizBtn.addEventListener('click', (e) => {
+    // Launch confetti burst
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#ff0a54', '#ff477e', '#ff7096', '#ff85a1', '#fbb1b1', '#f9bec7']
+    });
+  });
+</script>
+{% endblock %}

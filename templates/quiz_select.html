@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Select Quiz Category</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+    <h1>🎯 Pick a Quiz Category</h1>
+</header>
+
+<main>
+    <div class="home-container">
+
+        <!-- Suggested Categories -->
+        <section class="categories-section">
+            <h2>Suggested Categories</h2>
+            <div class="categories">
+                {% set suggested = {
+                    "Science": "🔬", 
+                    "Math": "📐", 
+                    "General Knowledge": "🌎", 
+                    "History": "🏰", 
+                    "Sports": "🏆", 
+                    "Movies": "🎬", 
+                    "Music": "🎵"
+                } %}
+                {% for cat, emoji in suggested.items() %}
+                <form method="post" action="/quiz" class="category-form">
+                    <input type="hidden" name="category" value="{{ cat }}">
+                    <button class="category-card" type="submit">
+                        <span class="emoji">{{ emoji }}</span>
+                        <span class="cat-name">{{ cat }}</span>
+                    </button>
+                </form>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Custom Category -->
+        <section class="custom-category-section">
+            <h2>Or Enter Your Own Category</h2>
+            <form method="post" action="/quiz" class="custom-category-form">
+                <input type="text" name="category" placeholder="Type your favorite category" required>
+                <button class="btn" type="submit">Start Quiz 🏁</button>
+            </form>
+        </section>
+
+        <!-- Back Home -->
+        <a class="btn back-home" href="/">← Back to Home</a>
+    </div>
+</main>
+</body>
+</html>

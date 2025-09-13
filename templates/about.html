@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Select Category</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Choose Quiz Category</h1>
+    <form method="post" action="/quiz">
+        {% for cat in categories %}
+            <input type="radio" name="category" value="{{ cat }}" required> {{ cat }}<br>
+        {% endfor %}
+        <br>
+        <button type="submit">Start Quiz</button>
+    </form>
+    <a href="/">Home</a>
+</body>
+</html>
